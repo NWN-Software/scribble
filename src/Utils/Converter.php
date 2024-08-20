@@ -22,22 +22,24 @@ class Converter
 
     protected Editor $editor;
 
-    protected array | Closure | null $mergeTagsMap = null;
+    protected array|Closure|null $mergeTagsMap = null;
+
+    protected array|Closure|null $userTagsMap = null;
 
     public function __construct(
-        public string | array | stdClass | null $content = null,
+        public string|array|stdClass|null $content = null,
     ) {
         if ($this->content instanceof stdClass) {
             $this->content = json_decode(json_encode($this->content), true);
         }
     }
 
-    public static function from(string | array | stdClass | null $content = null): static
+    public static function from(string|array|stdClass|null $content = null): static
     {
         return new static($content);
     }
 
-    public function to(ContentType $type, bool $toc = false, int $maxDepth = 3): string | array
+    public function to(ContentType $type, bool $toc = false, int $maxDepth = 3): string|array
     {
         return match ($type) {
             ContentType::Html => $this->toHtml(toc: $toc, maxDepth: $maxDepth),
@@ -47,16 +49,23 @@ class Converter
         };
     }
 
-    public function convert(string | array $content): static
+    public function convert(string|array $content): static
     {
         $this->content = $content;
 
         return $this;
     }
 
-    public function mergeTagsMap(array | Closure $mergeTagsMap): static
+    public function mergeTagsMap(array|Closure $mergeTagsMap): static
     {
         $this->mergeTagsMap = $mergeTagsMap;
+
+        return $this;
+    }
+
+    public function userTagsMap(array|Closure $userTagsMap): static
+    {
+        $this->userTagsMap = $userTagsMap;
 
         return $this;
     }
@@ -74,15 +83,16 @@ class Converter
     {
         return $this->editor ??= new Editor([
             'extensions' => [
-                new \Tiptap\Nodes\Document(),
-                new \Tiptap\Nodes\Text(),
-                new \Tiptap\Nodes\HardBreak(),
-                new \Tiptap\Marks\TextStyle(),
-                new ClassExtension(),
-                new IdExtension(),
-                new ListItem(),
-                new ScribbleBlock(),
-                new MergeTag(),
+                new \Tiptap\Nodes\Document,
+                new \Tiptap\Nodes\Text,
+                new \Tiptap\Nodes\HardBreak,
+                new \Tiptap\Marks\TextStyle,
+                new ClassExtension,
+                new IdExtension,
+                new ListItem,
+                new ScribbleBlock,
+                new MergeTag,
+                new UserTag,
                 ...$this->getExtensions(),
             ],
         ]);
@@ -116,6 +126,10 @@ class Converter
 
         if (filled($this->getMergeTagsMap())) {
             $this->parseMergeTags($editor);
+        }
+
+        if (filled($this->getUserTagsMap())) {
+            $this->parseUserTags($editor);
         }
 
         return $editor->getHTML();
@@ -183,7 +197,7 @@ class Converter
                             [
                                 'type' => 'link',
                                 'attrs' => [
-                                    'href' => '#' . $node->attrs->id,
+                                    'href' => '#'.$node->attrs->id,
                                     'class' => 'toc-link',
                                 ],
                             ],
@@ -199,7 +213,7 @@ class Converter
                         [
                             'type' => 'link',
                             'attrs' => [
-                                'href' => '#' . $node->attrs->id,
+                                'href' => '#'.$node->attrs->id,
                                 'class' => 'toc-link',
                             ],
                         ],
@@ -249,7 +263,7 @@ class Converter
             $prev <= $item['level'] ?: $result .= str_repeat('</ul>', $prev - $item['level']);
             $prev >= $item['level'] ?: $result .= '<ul>';
 
-            $result .= '<li><a href="#' . $item['id'] . '">' . $item['text'] . '</a></li>';
+            $result .= '<li><a href="#'.$item['id'].'">'.$item['text'].'</a></li>';
 
             $prev = $item['level'];
         }
@@ -281,8 +295,35 @@ class Converter
         return $editor;
     }
 
+    public function parseUserTags(Editor $editor): Editor
+    {
+        $editor->descendants(function (&$node) {
+            if ($node->type !== 'userTag') {
+                return;
+            }
+
+            $map = $this->getUserTagsMap();
+
+            if (filled($map)) {
+                $node->content = [
+                    (object) [
+                        'type' => 'text',
+                        'text' => $map[$node->attrs->id] ?? null,
+                    ],
+                ];
+            }
+        });
+
+        return $editor;
+    }
+
     public function getMergeTagsMap(): array
     {
         return $this->evaluate($this->mergeTagsMap) ?? app(ScribbleManager::class)->getMergeTagsMap();
+    }
+
+    public function getUserTagsMap(): array
+    {
+        return $this->evaluate($this->userTagsMap) ?? app(ScribbleManager::class)->getUserTagsMap();
     }
 }

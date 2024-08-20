@@ -8,6 +8,7 @@ use Awcodes\Scribble\Concerns\HasMergeTags;
 use Awcodes\Scribble\Concerns\HasProfiles;
 use Awcodes\Scribble\Concerns\HasSuggestionTools;
 use Awcodes\Scribble\Concerns\HasToolbarTools;
+use Awcodes\Scribble\Concerns\HasUserTags;
 use Awcodes\Scribble\Utils\Converter;
 use Filament\Forms\Components\Field;
 use Filament\Support\Concerns\HasPlaceholder;
@@ -22,6 +23,7 @@ class ScribbleEditor extends Field
     use HasProfiles;
     use HasSuggestionTools;
     use HasToolbarTools;
+    use HasUserTags;
 
     protected string $view = 'scribble::scribble-editor';
 

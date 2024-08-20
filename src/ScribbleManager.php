@@ -17,11 +17,20 @@ class ScribbleManager extends Component
 
     protected array $registeredToolPaths = [];
 
-    protected array | Closure | null $mergeTagsMap = null;
+    protected array|Closure|null $mergeTagsMap = null;
 
-    public function mergeTagsMap(array | Closure $mergeTagsMap): static
+    protected array|Closure|null $userTagsMap = null;
+
+    public function mergeTagsMap(array|Closure $mergeTagsMap): static
     {
         $this->mergeTagsMap = $mergeTagsMap;
+
+        return $this;
+    }
+
+    public function userTagsMap(array|Closure $userTagsMap): static
+    {
+        $this->userTagsMap = $userTagsMap;
 
         return $this;
     }
@@ -37,10 +46,10 @@ class ScribbleManager extends Component
                 fn ($file) => Str::of($file->getRelativePathname())
                     ->before('.php')
                     ->replace('/', '\\')
-                    ->start($namespace . '\\')
+                    ->start($namespace.'\\')
                     ->toString()
             )
-            ->filter(fn($tool) => is_subclass_of($tool, ScribbleTool::class))
+            ->filter(fn ($tool) => is_subclass_of($tool, ScribbleTool::class))
             ->map(fn ($tool) => $tool::make())
             ->all();
 
@@ -74,7 +83,7 @@ class ScribbleManager extends Component
         });
     }
 
-    public function getTools(array | string $tools): Collection
+    public function getTools(array|string $tools): Collection
     {
         $tls = collect();
 
@@ -98,5 +107,10 @@ class ScribbleManager extends Component
     public function getMergeTagsMap(): array
     {
         return $this->evaluate($this->mergeTagsMap) ?? [];
+    }
+
+    public function getUserTagsMap(): array
+    {
+        return $this->evaluate($this->userTagsMap) ?? [];
     }
 }

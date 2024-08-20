@@ -42,6 +42,18 @@ export default Extension.create({
                             return false;
                         }
 
+                        if (event.dataTransfer.getData('userTag')) {
+                            event.target.dispatchEvent(new CustomEvent('dragged-user-tag', {
+                                detail: {
+                                    tag: event.dataTransfer.getData('userTag'),
+                                    coordinates,
+                                },
+                                bubbles: true,
+                            }))
+
+                            return false;
+                        }
+
                         return false;
                     },
                 },

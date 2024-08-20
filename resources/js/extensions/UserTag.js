@@ -1,7 +1,7 @@
 import { mergeAttributes, Node } from '@tiptap/core'
 
 export default Node.create({
-    name: 'mergeTag',
+    name: 'userTag',
 
     group: 'inline',
 
@@ -44,19 +44,19 @@ export default Node.create({
                 { 'data-type': this.name },
                 HTMLAttributes
             ),
-            `xx ${node.attrs.id} }}`,
+            `@${node.attrs.id}`,
         ]
     },
 
     renderText({ node }) {
-        return `xx ${node.attrs.id} }}`
+        return `@${node.attrs.id}`
     },
 
     addKeyboardShortcuts() {
         return {
             Backspace: () =>
                 this.editor.commands.command(({ tr, state }) => {
-                    let isMergeTag = false
+                    let isUserTag = false
                     const { selection } = state
                     const { empty, anchor } = selection
 
@@ -66,9 +66,9 @@ export default Node.create({
 
                     state.doc.nodesBetween(anchor - 1, anchor, (node, pos) => {
                         if (node.type.name === this.name) {
-                            isMergeTag = true
+                            isUserTag = true
                             tr.insertText(
-                                'xx',
+                                '@',
                                 pos,
                                 pos + node.nodeSize
                             )
@@ -77,14 +77,14 @@ export default Node.create({
                         }
                     })
 
-                    return isMergeTag
+                    return isUserTag
                 })
         }
     },
 
     addCommands() {
         return {
-            insertMergeTag: (attributes) => ({ chain, state }) => {
+            insertUserTag: (attributes) => ({ chain, state }) => {
                 const currentChain = chain()
 
                 if (! [null, undefined].includes(attributes.coordinates?.pos)) {

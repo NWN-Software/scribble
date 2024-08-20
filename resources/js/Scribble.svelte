@@ -30,6 +30,8 @@
     import MediaExtension from './extensions/MediaExtension.js'
     import MergeTag from './extensions/MergeTag.js'
     import MergeTagsExtension from './extensions/MergeTagsExtension.js'
+    import UserTag from './extensions/UserTag.js'
+    import UserTagsExtension from './extensions/UserTagsExtension.js'
     import OrderedList from '@tiptap/extension-ordered-list'
     import Paragraph from '@tiptap/extension-paragraph'
     import Placeholder from '@tiptap/extension-placeholder'
@@ -67,6 +69,7 @@
     export let suggestionTools;
     export let toolbarTools;
     export let mergeTags;
+    export let userTags;
     export let headingLevels = [1,2,3];
 
     tools = Array.from(new Set([
@@ -259,6 +262,20 @@
             )
         }
 
+        if (userTags?.length) {
+            extensions.push(
+                UserTag.configure({
+                    userTags,
+                }),
+            )
+
+            extensions.push(
+                UserTagsExtension.configure({
+                    tags: userTags,
+                    statePath: statePath
+                })
+            )
+        }
         editor = new Editor({
             content: content,
             element: element,
@@ -348,14 +365,14 @@
 <div
     class={cx(
         `scribble-editor-wrapper`,
-        {'has-empty-panel': ! ((suggestionTools && suggestionTools.length > 0) || (mergeTags && mergeTags.length > 0))}
+        {'has-empty-panel': ! ((suggestionTools && suggestionTools.length > 0) || (mergeTags && mergeTags.length > 0) || (userTags && userTags.length > 0))}
     )}
 >
     <Controls {editor} {statePath} />
 
     <Toolbar {editor} tools={toolbarTools} {handleToolClick} {isActive} />
 
-    <BlockPanel {editor} tools={suggestionTools} mergeTags={mergeTags} {handleToolClick} {isActive} />
+    <BlockPanel {editor} tools={suggestionTools} mergeTags={mergeTags} userTags={userTags} {handleToolClick} {isActive} />
 
     <div class="scribble-content">
         <div class="scribble-editor" bind:this={element} />
