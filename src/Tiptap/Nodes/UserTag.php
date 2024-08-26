@@ -30,7 +30,7 @@ class UserTag extends Node
                     }
 
                     return [
-                        'data-id' => $attributes->id,
+                        'data-id' => $attributes->id->id,
                     ];
                 },
             ],

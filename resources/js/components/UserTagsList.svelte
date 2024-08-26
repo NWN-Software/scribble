@@ -95,7 +95,7 @@
                     selectedIndex ? 'active-option' : '' }"
                 >
                     <span class="text">
-                        {item}
+                        {item.name}
                     </span>
                 </button>
             {/each}

@@ -22,7 +22,7 @@ export default Node.create({
                     }
 
                     return {
-                        'data-id': attributes.id
+                        'data-id': attributes.id.id
                     }
                 }
             },
@@ -44,12 +44,12 @@ export default Node.create({
                 { 'data-type': this.name },
                 HTMLAttributes
             ),
-            `@${node.attrs.id}`,
+            `@${node.attrs.id.name}`,
         ]
     },
 
     renderText({ node }) {
-        return `@${node.attrs.id}`
+        return `@${node.attrs.id.name}`
     },
 
     addKeyboardShortcuts() {

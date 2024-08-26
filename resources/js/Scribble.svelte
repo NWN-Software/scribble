@@ -262,7 +262,9 @@
             )
         }
 
+        console.log("userTags", userTags)
         if (userTags?.length) {
+            console.log("userTags", userTags)
             extensions.push(
                 UserTag.configure({
                     userTags,

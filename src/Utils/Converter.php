@@ -10,6 +10,7 @@ use Awcodes\Scribble\Tiptap\Extensions\IdExtension;
 use Awcodes\Scribble\Tiptap\Nodes\ListItem;
 use Awcodes\Scribble\Tiptap\Nodes\MergeTag;
 use Awcodes\Scribble\Tiptap\Nodes\ScribbleBlock;
+use Awcodes\Scribble\Tiptap\Nodes\UserTag;
 use Closure;
 use Filament\Support\Concerns\EvaluatesClosures;
 use League\HTMLToMarkdown\HtmlConverter;
@@ -128,9 +129,7 @@ class Converter
             $this->parseMergeTags($editor);
         }
 
-        if (filled($this->getUserTagsMap())) {
-            $this->parseUserTags($editor);
-        }
+        $this->parseUserTags($editor);
 
         return $editor->getHTML();
     }
@@ -308,7 +307,12 @@ class Converter
                 $node->content = [
                     (object) [
                         'type' => 'text',
-                        'text' => $map[$node->attrs->id] ?? null,
+                        'marks' => [
+                            [
+                                'type' => 'bold',
+                            ],
+                        ],
+                        'text' => $map[$node->attrs->id->id] ?? null,
                     ],
                 ];
             }

@@ -29,7 +29,7 @@ export default Extension.create({
                 startOfLine: false,
                 pluginKey: new PluginKey('userTagsExtension'),
                 items: ({ query }) => {
-                    return this.options.tags.filter(item => item.toLowerCase().includes(query.toLowerCase()))
+                    return this.options.tags.filter(item => item.name.toLowerCase().includes(query.toLowerCase()))
                 },
                 render: () => {
                     let component
