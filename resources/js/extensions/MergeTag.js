@@ -44,12 +44,12 @@ export default Node.create({
                 { 'data-type': this.name },
                 HTMLAttributes
             ),
-            `xx ${node.attrs.id} }}`,
+            `{{ ${node.attrs.id} }}`,
         ]
     },
 
     renderText({ node }) {
-        return `xx ${node.attrs.id} }}`
+        return `{{ ${node.attrs.id} }}`
     },
 
     addKeyboardShortcuts() {
@@ -68,7 +68,7 @@ export default Node.create({
                         if (node.type.name === this.name) {
                             isMergeTag = true
                             tr.insertText(
-                                'xx',
+                                '{{',
                                 pos,
                                 pos + node.nodeSize
                             )
