@@ -9,5 +9,7 @@ return [
         'alt_hint_tooltip' => 'Learn how to describe the purpose of the image.',
         'title' => 'Title',
         'lazy' => 'Lazy Load',
+        'width' => 'Width',
+        'height' => 'Height',
     ],
 ];

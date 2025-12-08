@@ -35,8 +35,10 @@ class ColorExtension extends Extension
                                 return null;
                             }
 
+                            $color = collect($attributes?->color ?? [])->join('');
+
                             return [
-                                'style' => "color: {$attributes->color}",
+                                'style' => "color: {$color}",
                             ];
                         },
                     ],
