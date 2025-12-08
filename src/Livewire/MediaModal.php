@@ -131,8 +131,10 @@ class MediaModal extends ScribbleModal
                         TextInput::make('title')
                             ->label(trans('scribble::media.labels.title')),
                         Group::make([
-                            TextInput::make('width'),
-                            TextInput::make('height'),
+                            TextInput::make('width')
+                                ->label(__('scribble::media.width')),
+                            TextInput::make('height')
+                                ->label(__('scribble::media.height')),
                         ])->columns()->hidden(fn (Get $get) => $get('type') == 'document'),
                         ToggleButtons::make('alignment')
                             ->options([
