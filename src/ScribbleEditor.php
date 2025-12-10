@@ -33,6 +33,12 @@ class ScribbleEditor extends Field
     {
         parent::setUp();
 
+        $this->afterStateHydrated(function (ScribbleEditor $component, $state): void {
+            if ($state) {
+                $component->state($component->modifyColorValues($state));
+            }
+        });
+
         $this->afterStateUpdated(function (ScribbleEditor $component, Component $livewire): void {
             $livewire->validateOnly($component->getStatePath());
         });
@@ -48,6 +54,52 @@ class ScribbleEditor extends Field
 
             return $state;
         });
+    }
+
+    protected function modifyColorValues($data) 
+    {
+        // Handle arrays
+        if (is_array($data)) {
+            $result = [];
+            foreach ($data as $key => $value) {
+                if ($key === 'color' && is_array($value)) {
+                    // Convert color array to hex string
+                    $result[$key] = $this->rgbArrayToHex($value);
+                } else {
+                    // Recursively process nested structures
+                    $result[$key] = $this->modifyColorValues($value);
+                }
+            }
+            return $result;
+        }
+        
+        // Handle objects
+        if (is_object($data)) {
+            $result = clone $data;
+            foreach ($result as $key => $value) {
+                if ($key === 'color' && is_array($value)) {
+                    $result->$key = rgbArrayToHex($value);
+                } else {
+                    $result->$key = modifyColorValues($value);
+                }
+            }
+            return $result;
+        }
+        
+        // Return primitive values as-is
+        return $data;
+    }
+    
+    protected function rgbArrayToHex($colorArray) {
+        // Convert array with numeric keys to hex
+        // Assumes array is [r, g, b] format
+        $values = array_values($colorArray);
+        
+        $r = hexdec($values[0]);
+        $g = hexdec($values[1]);
+        $b = hexdec($values[2]);
+        
+        return sprintf("#%02x%02x%02x", $r, $g, $b);
     }
 
     public function headingLevels(array $levels): static
